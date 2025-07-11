@@ -1,0 +1,11 @@
+# Web scraping y automatización de navegador
+selenium>=4.8.0
+webdriver-manager>=3.8.6
+
+# Framework para futura app web
+Flask>=2.2.0
+gunicorn>=20.1.0
+
+# Empaquetado a ejecutable
+pyinstaller>=5.10.0
+
