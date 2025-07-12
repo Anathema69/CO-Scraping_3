@@ -262,3 +262,106 @@ input[type="checkbox"]:checked::before {
   min-width: 100% !important;
   width: max-content !important;
 }
+
+/* — GRID 3 columnas para Ámbito / Asunto / Publicación — */
+.grid.three-col {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* — Etiquetas de grupo — */
+.group-title {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: var(--text-light);
+}
+
+/* — Checkbox & Radio custom — */
+.checkbox-group label,
+.radio-group label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.checkbox-group input,
+.radio-group input {
+  display: none;
+}
+
+.checkbox-custom,
+.radio-custom {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #555;
+  border-radius: 3px;
+  margin-right: 0.5rem;
+  position: relative;
+}
+
+/* círculo para radio */
+.radio-custom {
+  border-radius: 50%;
+}
+
+/* marca interna */
+.checkbox-custom::after,
+.radio-custom::after {
+  content: '';
+  position: absolute;
+  display: none;
+}
+
+/* palomita */
+.checkbox-custom::after {
+  width: 0.5rem;
+  height: 0.3rem;
+  border-left: 3px solid #0de;
+  border-bottom: 3px solid #0de;
+  transform: rotate(-45deg);
+  top: 2px;
+  left: 4px;
+}
+
+/* punto */
+.radio-custom::after {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #0de;
+  top: 2px;
+  left: 2px;
+}
+
+/* cuando está CHECKED */
+.checkbox-group input:checked + .checkbox-custom,
+.radio-group input:checked + .radio-custom {
+  border-color: #0de;
+}
+
+.checkbox-group input:checked + .checkbox-custom::after,
+.radio-group input:checked + .radio-custom::after {
+  display: block;
+}
+
+/* un poco de espacio antes del botón */
+.btn-submit {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+/* más separación tras cada campo */
+.field {
+  margin-bottom: 1.5rem;
+}
+
+/* un poquito más de altura interna en el combobox de salas */
+#sala-select + .ts-control,
+#sala-select {
+  padding: 0.5rem 0.75rem;
+}
