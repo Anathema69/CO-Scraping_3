@@ -8,6 +8,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+import re
+
+from downloader import paginate_and_download 
 
 # ——————————————————————————————————————————————
 # Aquí importas o dejas definidas tus funciones:
@@ -447,6 +450,30 @@ def set_publicacion(driver, publicacion, max_retries=3, wait=5):
 
 # ——————————————————————————————————————————————
 
+
+# ______________________________________________
+# funciones para la descargas
+def wait_for_results(driver, timeout=30, poll_frequency=0.5):
+    """
+    Espera hasta que el elemento pagText2 contenga un texto del estilo:
+      Resultado: <número> / <total>
+    y, opcionalmente, que la tabla de resultados tenga al menos una fila.
+    """
+    # 1) Esperamos a que el span de pagText2 tenga texto y sea estable
+    def pag_loaded(d):
+        txt = d.find_element(By.ID, "resultForm:pagText2").text
+        # busca algo como "Resultado: 1 /  36842"
+        return bool(re.search(r"Resultado\s*:\s*\d+\s*/\s*\d+", txt))
+
+    WebDriverWait(driver, timeout, poll_frequency).until(pag_loaded)
+    print(f"[OK] contador de resultados detectado: {driver.find_element(By.ID,'resultForm:pagText2').text}")
+
+    # 2) (Opcional) Esperar a que la tabla tenga al menos 1 fila de datos
+    WebDriverWait(driver, timeout, poll_frequency).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "#resultForm\\:jurisTable tbody tr"))
+    )
+    print("[OK] tabla de resultados poblada con al menos una fila")
+
 app = Flask(__name__)
 
 URL = "https://consultajurisprudencial.ramajudicial.gov.co/WebRelatoria/csj/index.xhtml"
@@ -488,7 +515,14 @@ def search():
     )
     boton_buscar.click()
 
-    # 5) Dejamos la ventana abierta para que el usuario la vea
+    # 5) esperar a que terminen de cargarse los resultados
+    wait_for_results(driver)
+
+    # 6) paginar y descargar
+    paginate_and_download(driver, max_pages=5, out_folder="descargas")
+
+
+    # 7) Dejamos la ventana abierta para que el usuario la vea
     return ("<p>Consulta iniciada en la nueva ventana del navegador.<br>"
             "Cuando termines, puedes cerrar manualmente Selenium.</p>")
 
