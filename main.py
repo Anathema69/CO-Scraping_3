@@ -9,6 +9,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import re
+import threading
+import webbrowser
 
 from downloader import paginate_and_download 
 
@@ -519,7 +521,7 @@ def search():
     wait_for_results(driver)
 
     # 6) paginar y descargar
-    paginate_and_download(driver, max_pages=5, out_folder="descargas")
+    paginate_and_download(driver, max_pages=None, out_folder="descargas")
 
 
     # 7) Dejamos la ventana abierta para que el usuario la vea
@@ -527,4 +529,11 @@ def search():
             "Cuando termines, puedes cerrar manualmente Selenium.</p>")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Espera un segundo y abre el navegador en la URL de tu app
+    def _open_browser():
+        webbrowser.open_new('http://127.0.0.1:5000/')
+
+    # Con use_reloader=False evitamos que Flask recargue y abra dos veces la pestaña
+    threading.Timer(1, _open_browser).start()
+    app.run(debug=True, use_reloader=False)
+    

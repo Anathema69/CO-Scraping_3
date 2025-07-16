@@ -41,7 +41,8 @@ def extract_ids_from_page(driver):
 
 def download_pdf(id_, out_folder="pdfs", session=None):
     """
-    Descarga el PDF con el ID dado y lo guarda en out_folder/{id}.pdf
+    Descarga el PDF con el ID dado y lo guarda usando el nombre que envía el servidor
+    en la cabecera Content-Disposition. Si no la encuentra, usa {id_}.pdf.
     """
     if session is None:
         session = requests.Session()
@@ -49,11 +50,24 @@ def download_pdf(id_, out_folder="pdfs", session=None):
     r = session.get(url, timeout=30)
     r.raise_for_status()
 
+    # tratamos de extraer filename de Content-Disposition
+    cd = r.headers.get('Content-Disposition', '')
+    filename = None
+    if cd:
+        # busca filename="algo.pdf"
+        m = re.search(r'filename="(?P<name>[^"]+)"', cd)
+        if m:
+            filename = m.group('name')
+
+    if not filename:
+        filename = f"{id_}.pdf"
+
     os.makedirs(out_folder, exist_ok=True)
-    path = os.path.join(out_folder, f"{id_}.pdf")
+    path = os.path.join(out_folder, filename)
     with open(path, "wb") as f:
         f.write(r.content)
-    print(f"[DOWNLOADED] {id_} → {path}")
+    print(f"[DOWNLOADED] {url} → {path}")
+
 
 
 def click_next_page(driver, wait=10):
